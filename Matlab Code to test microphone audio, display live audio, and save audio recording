@@ -1,0 +1,69 @@
+% The script will produce a GUI displaying live audio plot from computer microphone. User can adjust different parameters, save the audio file.
+% This code is provided by Dr. Goan, https://www.academicblock.com
+% Motivation for this code comes from - https://www.academicblock.com/technology/web-tools/test-my-mic
+
+% Check if Audio Toolbox and DSP System Toolbox are available
+if ~license('test', 'Audio_Toolbox') || ~license('test', 'DSP_System_Toolbox')
+    error('This script requires the Audio Toolbox and DSP System Toolbox.');
+end
+
+% Parameters
+fs = 44100;         % Sampling frequency
+nBits = 16;         % Bits per sample
+nChannels = 1;      % Number of audio channels (1 for mono, 2 for stereo)
+recordTime = 10;    % Recording time in seconds
+
+% Create an audio recorder object
+recObj = audiorecorder(fs, nBits, nChannels);
+
+% Create a figure for live waveform display
+hFig = figure('Name', 'Live Audio Waveform', 'NumberTitle', 'off');
+hAx = axes('Parent', hFig);
+hLine = plot(hAx, NaN, NaN);
+xlabel(hAx, 'Time (s)');
+ylabel(hAx, 'Amplitude');
+title(hAx, 'Live Audio Waveform');
+grid(hAx, 'on');
+
+% Set up the audio recording callback function
+recObj.TimerPeriod = 0.1; % Update every 0.1 seconds
+recObj.TimerFcn = @(src, event) updateWaveform(src, hLine, fs);
+
+% Start recording
+disp('Start speaking.')
+record(recObj, recordTime);
+
+% Wait for the recording to finish
+pause(recordTime + 0.5);
+
+% Stop recording
+disp('Recording finished.');
+stop(recObj);
+
+% Get the recorded audio data
+audioData = getaudiodata(recObj);
+
+% Plot the final waveform
+t = (0:length(audioData)-1) / fs;
+plot(hAx, t, audioData);
+xlabel(hAx, 'Time (s)');
+ylabel(hAx, 'Amplitude');
+title(hAx, 'Recorded Audio Waveform');
+
+% Prompt the user for the filename to save
+[file, path] = uiputfile('*.mp3', 'Save Audio As');
+if ischar(file)
+    % Save the recorded audio as MP3
+    audiowrite(fullfile(path, file), audioData, fs);
+    disp(['Audio saved as ', fullfile(path, file)]);
+else
+    disp('File saving canceled.');
+end
+
+% Callback function to update the live waveform
+function updateWaveform(recObj, hLine, fs)
+    audioData = getaudiodata(recObj);
+    t = (0:length(audioData)-1) / fs;
+    set(hLine, 'XData', t, 'YData', audioData);
+    drawnow;
+end
