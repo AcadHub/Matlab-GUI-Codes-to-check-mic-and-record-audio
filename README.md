@@ -1,9 +1,9 @@
 # Matlab-GUI-Codes-to-check-mic-and-record-audio
 This Matlab GUI code will allow user to test their computer Microphone and record audio. 
-This code is provided by Dr. Goan (https://www.academicblock.com)
 
-Motivation for this codes came from: https://www.academicblock.com/technology/web-tools/test-my-mic
+This code is inspired by a article on <a href="https://www.academicblock.com/technology/web-tools/test-my-mic">Test my mic</a> page.
 
+This code is provided by Dr. Goan,  <a href="https://www.academicblock.com/">Academic Block</a>
 
 
 Requirements
